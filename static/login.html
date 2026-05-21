@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión - Tienda Costos SAC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+
+<body>
+    <div class="card">
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <input type="text" name="username" placeholder="Usuario" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <button type="submit">Ingresar</button>
+        </form>
+        <div class="error" id="errorMsg"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const errorMsg = document.getElementById('errorMsg');
+
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            errorMsg.textContent = "";
+
+            const formData = new FormData(form);
+
+            try {
+                const resp = await fetch('/token', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (resp.ok) {
+                    const data = await resp.json();
+                    localStorage.setItem('token', data.access_token);
+                    window.location.href = '/static/index.html';
+                } else {
+                    errorMsg.textContent = "Usuario o contraseña incorrectos";
+                }
+            } catch (err) {
+                errorMsg.textContent = "Error de conexión";
+            }
+        });
+    </script>
+</body>
+
+</html>

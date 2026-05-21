@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Ferretería Costos SAC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <div style="width:24px;height:24px;background:var(--accent);border-radius:4px;"></div>
+      Ferretería <span>Costos</span>
+    </div>
+    <div class="nav-item active">Dashboard</div>
+    <div class="nav-item">Productos</div>
+    <div class="nav-item">Configuración</div>
+    <div class="user-profile">
+      <div class="avatar">A</div>
+      <div>
+        <div style="font-weight:600;font-size:0.9rem;">Admin</div>
+        <div style="font-size:0.75rem;color:var(--text-secondary);">Administrador</div>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Salir</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="header">
+      <div>
+        <h1>Dashboard de Predicciones</h1>
+        <p>Vista general de la demanda y rendimiento del modelo.</p>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="dashboard-tabs">
+      <button class="tab-btn active" data-view="comparison">📊 Comparación</button>
+      <button class="tab-btn" data-view="temporal">📈 Proyección Estacional</button>
+      <button class="tab-btn" data-view="category">📂 Por Categoría</button>
+      <button class="tab-btn" data-view="top">🏆 Top Productos</button>
+    </div>
+
+    <!-- View: Comparison (Default) -->
+    <div class="view-container" id="view-comparison">
+
+      <!-- Stats Grid (Only visible in Comparison) -->
+      <div class="grid">
+        <div class="card">
+          <h3>Demanda Total Prevista</h3>
+          <p class="stat-value" id="totalDemand">0</p>
+          <span class="stat-change text-success">Unidades</span>
+        </div>
+        <div class="card">
+          <h3>Precisión del Modelo</h3>
+          <p class="stat-value">92.5%</p>
+          <span class="stat-change text-danger">Error medio: 0.5%</span>
+        </div>
+        <div class="card">
+          <h3>Productos Analizados</h3>
+          <p class="stat-value" id="prodCount">0</p>
+          <span class="stat-change text-success">En comparación</span>
+        </div>
+        <div class="card">
+          <h3>Producto Top</h3>
+          <p class="stat-value" id="topProduct">-</p>
+          <span class="stat-change text-success" id="topProductVal">Mayor demanda</span>
+        </div>
+      </div>
+
+      <div class="dashboard-row">
+        <!-- Controls -->
+        <div class="card control-panel">
+          <h3 style="font-size:1.1rem; color:white; margin-bottom:1rem;">Agregar Producto</h3>
+          <div>
+            <label>Producto</label>
+            <select id="selProducto"></select>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+            <div>
+              <label>Marca</label>
+              <select id="selMarca"></select>
+            </div>
+            <div>
+              <label>Categoría</label>
+              <select id="selCategoria"></select>
+            </div>
+          </div>
+          <div>
+            <label>Precio Unit.</label>
+            <input type="number" id="inpPrecio" value="10" step="0.01">
+          </div>
+          <button class="btn" id="btnAdd">Agregar a Comparación</button>
+          <div class="product-list" id="productList"></div>
+          <!-- Alerts Section -->
+          <div style="margin-top:auto; border-top:1px solid #374151; padding-top:1rem;">
+            <h4 style="margin:0 0 0.5rem 0; font-size:0.9rem; color:#9CA3AF;">Alertas y Oportunidades</h4>
+            <div id="alertsList" style="font-size:0.8rem; color:#F9FAFB;">
+              <div style="padding:0.5rem; color:#9CA3AF;">Agrega productos para ver alertas.</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary" id="btnCompare">Actualizar Gráfico</button>
+        </div>
+
+        <!-- Chart -->
+        <div class="card">
+          <h3 style="font-size:1.1rem; color:white; margin-bottom:1rem;">Comparativa de Demanda Estimada</h3>
+          <div class="chart-container">
+            <canvas id="demandChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View: Temporal Prediction -->
+    <div class="view-container" id="view-temporal" style="display:none;">
+      <div class="dashboard-row">
+        <!-- Controls -->
+        <div class="card control-panel">
+          <h3 style="font-size:1.1rem; color:white; margin-bottom:1rem;">Proyección con Estacionalidad</h3>
+          <div>
+            <label>Producto</label>
+            <select id="selProductoTemporal"></select>
+          </div>
+          <div>
+            <label>Marca</label>
+            <select id="selMarcaTemporal"></select>
+          </div>
+          <div>
+            <label>Categoría</label>
+            <select id="selCategoriaTemporal"></select>
+          </div>
+          <div>
+            <label>Precio Unitario</label>
+            <input type="number" id="inpPrecioTemporal" value="10" step="0.01">
+          </div>
+          <div>
+            <label>Meses a Proyectar</label>
+            <input type="number" id="inpMesesTemporal" value="12" min="1" max="24">
+          </div>
+          <button class="btn" id="btnGenerateTemporal">Generar Proyección</button>
+
+          <div
+            style="margin-top:0.75rem; padding:0.5rem; background:rgba(59,130,246,0.1); border-radius:4px; font-size:0.75rem; color:#9CA3AF;">
+            ℹ️ Usa demanda base + ajuste estacional para ferretería
+          </div>
+
+          <!-- Metrics -->
+          <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid #374151;">
+            <h4 style="margin:0 0 0.5rem 0; font-size:0.9rem; color:#9CA3AF;">Métricas</h4>
+            <div style="font-size:0.85rem; color:#F9FAFB;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
+                <span>Promedio:</span>
+                <strong id="metricAvg">-</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
+                <span>Pico:</span>
+                <strong id="metricPeak" style="color:#10B981;">-</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span>Valle:</span>
+                <strong id="metricLow" style="color:#EF4444;">-</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="card">
+          <h3 style="font-size:1.1rem; color:white; margin-bottom:1rem;">Proyección de Demanda con Estacionalidad</h3>
+          <div class="chart-container">
+            <h3 style="font-size:1.1rem; color:white; margin-bottom:1rem;">Top Productos</h3>
+            <div>
+              <label>Cantidad de Productos</label>
+              <input type="number" id="inpTopCount" value="10" min="5" max="20">
+            </div>
+            <button class="btn" id="btnGenerateTop">Generar Ranking</button>
+            <div id="topLoadingStatus"
+              style="margin-top:1rem; padding:0.75rem; background:rgba(59,130,246,0.1); border-radius:6px; font-size:0.85rem; color:#9CA3AF; display:none;">
+              ⏳ Cargando predicciones...
+            </div>
+            <div
+              style="margin-top:1rem; padding:0.75rem; background:rgba(59,130,246,0.1); border-radius:6px; font-size:0.85rem; color:#9CA3AF;">
+              ℹ️ Usa precios promedio históricos de cada producto automáticamente.
+            </div>
+          </div>
+
+          <!-- Chart -->
+          <div class="card">
+            <h3 style="font-size:1.1rem; color:white; margin-bottom:1rem;">Productos con Mayor Demanda Estimada</h3>
+            <div class="chart-container">
+              <canvas id="topChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+
+</html>

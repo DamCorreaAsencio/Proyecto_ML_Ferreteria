@@ -1,0 +1,7 @@
+{
+  "r2_score": 0.8223,
+  "accuracy_pct": 82.23,
+  "mae": 61.47,
+  "error_pct": 36.93,
+  "model_type": "Random Forest"
+}
